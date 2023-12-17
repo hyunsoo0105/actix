@@ -56,3 +56,29 @@ src 폴더에 [main.rs](./src/main.rs) 작성
 > 서버를 실행하여 서버 동작 확인
 <br>Api를 호출하여 응답 확인 <br>
 
+### 2. State 와 AppData
+
+참고 : [state 폴더](./src/state)
+
+[state.rs](./src/state/state.rs)
+* app_data를 사용하여 서버가 실행 될 대 값을 설정해 놓을수있다.
+* mutex로 가변되는 변수 설정 가능
+* state_config 함수처럼 ServiceConfig를 받아 서버 설정 가능
+
+[mod.rs](./src/state/mod.rs)
+* 해당 폴더 내 코드를 다른데서 사용가능하게 mod를 사용해 모듈로  state를 설정
+* 이방법 말고도 다른 방법도 있음 추후 사용예정
+
+[state.rs](./src/state/state.rs)
+* ServiceConf를 통해 원하는 서버의 설정을 추가 할 수 있음
+* app_data를 통해 필요한 데이터를 서버 실행시 설정할 수 있음
+* Mutex를 사용하여 공유데이터를 보호하는 변수 생성
+* web::Data를 사용하여 스레드간 안전하게 참조가능한 공간 생성
+* 가변 state를 사용할때는 먼저 web::Data를 선언 후 clone으로 app_date에 등록한다.
+  * 이유 : web::Data는 [Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html)를 사용하는데 두개를 생성하지 않기 위해선 데이터 등록 전 생성해야함
+* web::scope를 사용해 접두사를 설정 가능
+
+[main.rs](./src/main.rs)
+* 선언한 state의 state_config 함수를 state::state::state_config와 같이 config에 사용
+* worker를 통해 멀티 스레드 설정
+  * 해당 설정시 expect를 사용하여 에러 컨트롤을 해줘야 실행이 가능
